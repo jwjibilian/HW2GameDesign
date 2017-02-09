@@ -5,15 +5,15 @@ using UnityEngine;
 public class AnimationDriver : MonoBehaviour {
 
     private Animator myAnimator;
-    //private CharacterController playerControler;
-    //private Rigidbody body;
+    private CharacterController playerControler;
+    private Rigidbody body;
     private int key = 9;
     private float speed = 1f;
     private float oldSpeed = 1f;
     float duration = 3f;
     private float time = 0f;
     RaycastHit hit;
-    float height = 2f;
+    float height = 5f;
     Vector3 down;
     private KeyCode[] keyCodes = {
         
@@ -31,14 +31,14 @@ public class AnimationDriver : MonoBehaviour {
     // Use this for initialization
     void Start () {
         myAnimator = GetComponent<Animator>();
-        //body = GetComponent<Rigidbody>();
-        //playerControler = GetComponent<CharacterController>();
+        body = GetComponent<Rigidbody>();
+        playerControler = GetComponent<CharacterController>();
         myAnimator.SetBool("OnGround", true);
 
     }
 	
 	// Update is called once per frame
-	void Update () {
+	void FixedUpdate () {
         for (int i = 0; i < keyCodes.Length; i++) {
             //Debug.Log(i);
             if (Input.GetKeyDown(keyCodes[i])) {
@@ -72,20 +72,22 @@ public class AnimationDriver : MonoBehaviour {
         Vector3 down = new Vector3(0, -1, 0);
         Vector3 orig = transform.position;
         Debug.DrawRay(transform.position, down, Color.green);
-        Debug.Log(Physics.Raycast(orig, down, height));
-        if (Physics.Raycast(orig, down, height))
+        Ray ray = new Ray(transform.position + Vector3.up, -Vector3.up);
+        RaycastHit hitInfo = new RaycastHit();
+        Debug.Log(Physics.Raycast(transform.position + Vector3.up, -Vector3.up));
+
+  
+        if (Physics.Raycast(ray, out hitInfo))
         {
-            //the ray collided with something, you can interact
-            // with the hit object now by using hit.collider.gameObject
-            //myAnimator.updateMode = AnimatorUpdateMode.Normal;
-            myAnimator.SetBool("OnGround", false);
+            if (hitInfo.distance > 1.75f)
+            {
+                myAnimator.SetBool("OnGround", false);
+            }
+            else {
+                myAnimator.SetBool("OnGround", true);
+            }
         }
-        else
-        {
-            //nothing was below your gameObject within 10m.
-           // myAnimator.updateMode = AnimatorUpdateMode.AnimatePhysics;
-            myAnimator.SetBool("OnGround", true);
-        } 
+
 
 
         myAnimator.SetFloat("VSpeed", speed * Input.GetAxis("Vertical"));
